@@ -9,7 +9,7 @@ use App\Helpers\BaseObject;
 class Account extends BaseModel
 {
 
-    private $label, $bank, $number, $typeId, $userId, $amount, $description, $status;
+    private $label, $bank, $number, $typeId, $userId, $amount, $description;
 
     const accTypeIdCash = 1,
     accTypeIdCC = 2,
@@ -72,6 +72,24 @@ class Account extends BaseModel
         }
     }
 
+    public static function getById(DbDriver $dbDriver, int $id): ?self{
+        $envCx = $dbDriver->getEnvConnection();
+
+        $accRow = $envCx->table('accounts')
+                        ->where('id', $id);
+
+        if($accRow->count() == 0){
+            return null;
+        }
+        
+        foreach($accRow->get() as $row){
+            $user = new self($row->id);
+            $user->row2Object((array)$row);
+        }
+
+        return $user;
+    }
+
     private function object2Row(): array{
         $model = [
             'label' => $this->label,
@@ -81,7 +99,7 @@ class Account extends BaseModel
             'user_id' => $this->userId,
             'amount' => $this->amount,
             'description' => $this->description,
-            'status' => $this->status,
+            'status' => $this->getStatusId(),
         ];
 
         return $model;
@@ -95,8 +113,7 @@ class Account extends BaseModel
         $this->userId = $row['user_id'];
         $this->amount = $row['amount'];
         $this->description = $row['description'];
-        $this->status = $this->getStatusId();
-
+        $this->setStatusId($row['status']);
     }
 
 }

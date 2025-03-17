@@ -35,6 +35,18 @@ class Controller extends BaseController
         Session::flash('warning', $message);
     }
 
+    function successJsonResponse(array $data){
+        return response()->json([
+            'response' => $data
+        ]);
+    }
+
+    function errorJsonResponse(array $data){
+        return response()->json([
+            'response' => $data
+        ], 400);
+    }
+
     public function getAuthUserLoginInfo(): ?array{    
         $thisUser = Session::get('thisUser');
         return $thisUser['userInfo'] ?? null; 

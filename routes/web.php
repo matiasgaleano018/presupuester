@@ -35,6 +35,7 @@ Route::group(['middleware' => 'authUser'], function () {
     Route::group(['prefix' => 'accounts'], function () {
         Route::get('/', [AccountController::class, 'getAccounts'])->name('accounts');
         Route::post('/', [AccountController::class, 'setAccount']);
+        Route::post('{id}/setStatus', [AccountController::class, 'setStatus'])->name('account-set-status');
     });
 });
 

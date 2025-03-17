@@ -44,6 +44,7 @@
     <!-- Tabler Core -->
     <script src="/js/tabler.min.js?1692870487" defer></script>
     <script src="/js/demo.min.js?1692870487" defer></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	@yield('js')
     <script>
       // @formatter:off

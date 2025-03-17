@@ -65,7 +65,7 @@ class User extends BaseModel
         return $user;
     }
 
-    public static function getByEmail(DbDriver $dbDriver, string $email): self{
+    public static function getByEmail(DbDriver $dbDriver, string $email): ?self{
         $envCx = $dbDriver->getEnvConnection();
 
         $userRow = $envCx->table('users')

@@ -49,4 +49,8 @@ class BaseObject {
     static function pyTimeNow(): \DateTimeImmutable{
         return new \DateTimeImmutable('now',self::pyTimeZone());
     }
+
+    static function setPyCurrencyFormat(float $amount): string{
+        return number_format($amount, 0, ',', '.');
+    }
 }

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Helpers\BaseObject;
 use App\Models\Account;
 use App\Models\User;
+use App\Helpers\ObjectStatus;
 use Illuminate\Support\Facades\Log;
 
 class AccountController extends Controller
@@ -17,8 +18,22 @@ class AccountController extends Controller
 
         $accTypes = Account::getAccountTypeList();
         $accounts = Account::getAllAccountsForUser($dbDriver, $userId);
+
+        $accModel = [];
+        foreach($accounts as $acc){
+            $accModel[] = [
+                'id' => $acc->id,
+                'label' => $acc->label,
+                'number' => $acc->number,
+                'bank' => $acc->bank,
+                'type_id' => $acc->type_id,
+                'amount' => BaseObject::setPyCurrencyFormat(floatval($acc->amount ?? 0)),
+                'description' => $acc->description,
+                'status' => $acc->status
+            ];
+        }
         
-        $param['accounts'] = $accounts;
+        $param['accounts'] = $accModel;
         $param['accTypes'] = $accTypes;
 
         return $this->returnView('accounts.index', $param);
@@ -52,5 +67,30 @@ class AccountController extends Controller
 
         $this->setSuccessMessage('Cuenta creada correctamente');
         return redirect()->back();
+    }
+
+    function setStatus(Request $request, int $accountId){
+        $dbDriver = $this->getDbDriver();
+        $user = $this->getAuthUserLoginInfo();
+        $userId = $user['id'];
+
+        $account = Account::getById($dbDriver, $accountId);
+        if(!$account){
+            return $this->errorJsonResponse([
+                'status' => 'error',
+                'message' => 'Cuenta no encontrada'
+            ]);
+        }
+
+        if($account->getStatusId() === ObjectStatus::objStatusActive){
+            $account->setStatusId(ObjectStatus::objStatusInactive);
+        }else{
+            $account->setStatusId(ObjectStatus::objStatusActive);
+        }
+        $account->writeToDb($dbDriver);
+
+        return $this->successJsonResponse([
+            'status' => 'ok'
+        ]);
     }
 }
